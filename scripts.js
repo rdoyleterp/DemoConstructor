@@ -24,7 +24,7 @@ function resetTiers() {
 function handleDesignationChange(tierNumber) {
     const designation = document.getElementById(`tier${tierNumber}Designation`).value;
     const tierResult = document.getElementById(`tier${tierNumber}Result`);
-    
+
     // Clear previous result if designation changes
     tierResult.value = "";
     document.getElementById(`subTier${tierNumber}Content`).classList.add('hidden');
@@ -36,8 +36,9 @@ function handleResultChange(tierNumber) {
     const result = document.getElementById(`tier${tierNumber}Result`).value;
     const subTierContent = document.getElementById(`subTier${tierNumber}Content`);
 
+    // Show the sub-tier only if the designation is Pre-Qualification and the result is Offer
     if (designation === "preQualification" && result === "offer") {
-        // Populate sub-tier content for Full Apply decisioning
+        // Display the sub-tier for Full Apply decisioning
         subTierContent.innerHTML = `
             <h3>Sub-Tier: Full Apply Decision</h3>
             <div class="form-group">
