@@ -25,13 +25,9 @@ function handleDesignationChange(tierNumber) {
     const designation = document.getElementById(`tier${tierNumber}Designation`).value;
     const tierResult = document.getElementById(`tier${tierNumber}Result`);
     
-    if (designation === "preQualification") {
-        // Reset result and show conditional content based on outcome
-        tierResult.value = "";
-        document.getElementById(`subTier${tierNumber}Content`).classList.add('hidden');
-    } else if (designation === "fullApply") {
-        document.getElementById(`subTier${tierNumber}Content`).classList.add('hidden');
-    }
+    // Clear previous result if designation changes
+    tierResult.value = "";
+    document.getElementById(`subTier${tierNumber}Content`).classList.add('hidden');
 }
 
 // Handle changes in the tier result
@@ -133,7 +129,7 @@ function addMarketplaceTier(container, verticalMarket) {
     addButton.style.width = '100%';
 
     addButton.onclick = function () {
-        if (lenderCount < 4) { // Allows for 3 additional lenders (total of 4)
+        if (lenderCount < 3) { // Allows for 2 additional lenders (total of 3)
             addLenderAndResultDropdown(container, verticalMarket, addButton);
             lenderCount++;
         }
