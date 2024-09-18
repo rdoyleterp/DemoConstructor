@@ -39,14 +39,15 @@ function handleResultChange(tierNumber) {
     // Only show sub-tier if designation is Pre-Qualification and result is Offer
     if (designation === 'preQualification' && result === 'offer') {
         const lendersInTier = document.querySelectorAll(`#tier${tierNumber}Content .lender-select`);
+        const resultsInTier = document.querySelectorAll(`#tier${tierNumber}Content .result-select`);
         const subTierHtml = [];
 
         lendersInTier.forEach((lenderSelect, index) => {
             const lenderName = lenderSelect.value;
-            const lenderResult = document.querySelector(`#tier${tierNumber}Content .result-select`).value;
+            const lenderResult = resultsInTier[index].value;
 
             if (lenderResult === 'offer') {
-                // Display lender name with result and approved dollar field
+                // Display lender name, full apply result dropdown, and approved amount field
                 subTierHtml.push(`
                     <div class="sub-tier-lender">
                         <label>${lenderName} (Full Apply Result)</label>
@@ -56,7 +57,7 @@ function handleResultChange(tierNumber) {
                             <option value="full-apply-decline">Full Apply Decline</option>
                             <option value="full-apply-pending">Full Apply Decision Pending</option>
                         </select>
-                        <input type="number" placeholder="Approved Amount" class="approved-amount" />
+                        <input type="number" class="approved-amount" placeholder="Approved Amount" min="0" />
                     </div>
                 `);
             }
