@@ -1,168 +1,168 @@
 body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 20px;
-            padding: 0;
-            text-align: center;
-            position: relative;
-        }
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 20px;
+    padding: 0;
+    text-align: center;
+    position: relative;
+}
 
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: left;
-        }
+.container {
+    max-width: 800px;
+    margin: auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-        }
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
 
-        h2 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #007bff;
-        }
+h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #007bff;
+}
 
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
 
-        .form-group select,
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
+.form-group select,
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
+}
 
-        .form-group input[type="number"] {
-            padding-left: 25px; /* Add space for the dollar sign */
-        }
+.form-group input[type="number"] {
+    padding-left: 25px;
+}
 
-        .form-group .dollar-sign {
-            position: absolute;
-            top: 67%;
-            left: 10px;
-            transform: translateY(-50%);
-            font-size: 16px;
-            color: #333;
-            line-height: 1; /* Ensures the dollar sign aligns perfectly with the input text */
-        }
+.form-group .dollar-sign {
+    position: absolute;
+    top: 67%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #333;
+    line-height: 1;
+}
 
-        .section {
-            margin-top: 30px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
+.section {
+    margin-top: 30px;
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+}
 
-        .section:first-of-type {
-            border-top: none;
-            padding-top: 0;
-        }
+.section:first-of-type {
+    border-top: none;
+    padding-top: 0;
+}
 
-        .config-menu {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+.config-menu {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
 
-        .config-menu-content {
-            display: none;
-            position: absolute;
-            top: 50px;
-            right: 0;
-            background-color: #fff;
-            color: #333;
-            min-width: 200px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            z-index: 1;
-        }
+.config-menu-content {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #fff;
+    color: #333;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1;
+}
 
-        .config-menu-content a {
-            padding: 10px;
-            text-decoration: none;
-            display: block;
-            color: #007bff;
-        }
+.config-menu-content a {
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+    color: #007bff;
+}
 
-        .config-menu-content a:hover {
-            background-color: #f1f1f1;
-        }
+.config-menu-content a:hover {
+    background-color: #f1f1f1;
+}
 
-        .config-menu-content select {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-        }
+.config-menu-content select {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+}
 
-        .config-menu-content .btn-submit {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 10px; /* Added spacing between buttons */
-        }
+.config-menu-content .btn-submit {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
 
-        .config-menu-content .btn-submit:hover {
-            background-color: #0056b3;
-        }
+.config-menu-content .btn-submit:hover {
+    background-color: #0056b3;
+}
 
-        .btn-launch-demo {
-            width: 100%;
-            padding: 12px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-        }
+.btn-launch-demo {
+    width: 100%;
+    padding: 12px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
 
-        .btn-launch-demo:hover {
-            background-color: #218838;
-        }
+.btn-launch-demo:hover {
+    background-color: #218838;
+}
 
-        .btn-download-json {
-            width: 100%;
-            padding: 12px;
-            background-color: #17a2b8;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
+.btn-download-json {
+    width: 100%;
+    padding: 12px;
+    background-color: #17a2b8;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
 
-        .btn-download-json:hover {
-            background-color: #138496;
-        }
+.btn-download-json:hover {
+    background-color: #138496;
+}
