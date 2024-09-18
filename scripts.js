@@ -61,6 +61,7 @@ function handleResultChange(tierNumber) {
     }
 }
 
+// Handle changes in the tier configuration dropdown
 function handleTierChange(tierNumber) {
     const verticalMarket = document.getElementById('verticalMarket').value;
     const tierContent = document.getElementById(`tier${tierNumber}Content`);
@@ -70,17 +71,21 @@ function handleTierChange(tierNumber) {
     const bottomResult = document.getElementById(`tier${tierNumber}Result`);
 
     if (selectedConfig === 'standard') {
+        // Populate a single lender dropdown
         addLenderDropdown(tierContent, verticalMarket);
         bottomResult.style.display = "block"; // Show the result dropdown
     } else if (selectedConfig === 'marketplace') {
+        // Populate a lender dropdown and an "Add Lender" button
         addMarketplaceTier(tierContent, verticalMarket);
         bottomResult.style.display = "none"; // Hide the result dropdown
     } else if (selectedConfig === 'split') {
+        // Populate the split configuration with lender dropdown and percentage fields
         addSplitDropdown(tierContent, 100, verticalMarket);
         bottomResult.style.display = "block"; // Show the result dropdown
     }
 }
 
+// Add a lender dropdown for standard configuration
 function addLenderDropdown(container, verticalMarket, beforeElement = null) {
     const lenderSelect = document.createElement('select');
     lenderSelect.classList.add('lender-select');
@@ -105,11 +110,14 @@ function addLenderDropdown(container, verticalMarket, beforeElement = null) {
     }
 }
 
+// Add lender dropdown and "Add Lender" button for marketplace configuration
 function addMarketplaceTier(container, verticalMarket) {
     let lenderCount = 1;
 
+    // Add the initial lender dropdown
     addLenderAndResultDropdown(container, verticalMarket);
 
+    // Add the "Add Lender" button
     const addButton = document.createElement('button');
     addButton.classList.add('btn-add-lender');
     addButton.innerText = '+ Add Lender';
@@ -125,7 +133,7 @@ function addMarketplaceTier(container, verticalMarket) {
     addButton.style.width = '100%';
 
     addButton.onclick = function () {
-        if (lenderCount < 3) {
+        if (lenderCount < 4) { // Allows for 3 additional lenders (total of 4)
             addLenderAndResultDropdown(container, verticalMarket, addButton);
             lenderCount++;
         }
@@ -134,6 +142,7 @@ function addMarketplaceTier(container, verticalMarket) {
     container.appendChild(addButton);
 }
 
+// Add lender and result dropdown for marketplace and split configurations
 function addLenderAndResultDropdown(container, verticalMarket, beforeElement = null) {
     const lenderGroup = document.createElement('div');
     lenderGroup.classList.add('lender-group');
@@ -177,6 +186,7 @@ function addLenderAndResultDropdown(container, verticalMarket, beforeElement = n
     }
 }
 
+// Add lender and percentage dropdown for split configuration
 function addSplitDropdown(container, initialPercentage, verticalMarket) {
     const lenderGroup = document.createElement('div');
     lenderGroup.classList.add('lender-group');
@@ -219,7 +229,7 @@ function addSplitDropdown(container, initialPercentage, verticalMarket) {
         if (totalPercentage > 100) {
             alert("Total percentage exceeds 100%. Removing the last lender added.");
             container.removeChild(lenderGroup);
-        } else if (totalPercentage < 100 && container.children.length < 4) {
+        } else if (totalPercentage < 100 && container.children.length < 4) {  // Ensure only one more dropdown can be added
             addSplitDropdown(container, 100 - totalPercentage, verticalMarket);
         }
     };
@@ -228,6 +238,7 @@ function addSplitDropdown(container, initialPercentage, verticalMarket) {
     container.appendChild(lenderGroup);
 }
 
+// Update selected lenders to avoid duplicates
 function updateSelectedLenders() {
     selectedLenders = Array.from(document.querySelectorAll('.lender-select'))
         .map(select => select.value)
