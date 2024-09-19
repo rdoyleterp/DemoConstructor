@@ -1,3 +1,24 @@
+const lendersByVertical = {
+    retail: ["Wells Fargo", "EasyPay", "Acima"],
+    electiveMedical: ["Care Credit", "Fortiva", "HFD"],
+    homeImprovement: ["Service", "Greensky", "BreadPay"]
+};
+
+const globalLenders = ["TD Bank", "Concora"];
+let selectedLenders = [];
+
+// Resets tiers when vertical market is changed
+function resetTiers() {
+    selectedLenders = [];
+    for (let i = 1; i <= 3; i++) {
+        document.getElementById(`tier${i}Config`).value = "";
+        document.getElementById(`tier${i}Content`).innerHTML = "";
+        document.getElementById(`tier${i}Designation`).value = "";
+        document.getElementById(`subTier${i}Content`).innerHTML = "";
+        document.getElementById(`subTier${i}Content`).classList.add('hidden');
+    }
+}
+
 // Handles changes to each tier based on the selected configuration
 function handleTierChange(tierNumber) {
     const verticalMarket = document.getElementById('verticalMarket').value;
@@ -194,4 +215,10 @@ function checkSubTier(tierNumber) {
     } else {
         subTierContainer.classList.add('hidden'); // Hide sub-tier if no offers
     }
+}
+
+// Handle the addition of a lender based on marketplace or split settings
+function handleLenderSelectionChange(tierNumber) {
+    const subTierContainer = document.getElementById(`subTier${tierNumber}Content`);
+    subTierContainer.classList.add('hidden'); // Hide sub-tier initially
 }
