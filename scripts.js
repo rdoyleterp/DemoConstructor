@@ -69,7 +69,7 @@ function addLenderDropdown(container, verticalMarket, tierNumber) {
         <option value="pending">Decision Pending</option>
     `;
     resultSelect.onchange = function() {
-        checkSubTier(tierNumber, lenderSelect.value, resultSelect.value);
+        checkSubTier(tierNumber); // Check the sub-tier logic when the result is selected
     };
     lenderGroup.appendChild(resultSelect);
 
@@ -148,46 +148,73 @@ function updateSelectedLenders() {
     });
 }
 
-// Check if sub-tier should appear for full apply decisioning
-function checkSubTier(tierNumber, lenderName, result) {
+// Check if sub-tier should appear for full apply decisioning, based on lenders set to "offer"
+function checkSubTier(tierNumber) {
+    const tierContent = document.getElementById(`tier${tierNumber}Content`);
     const subTierContainer = document.getElementById(`subTier${tierNumber}Content`);
     subTierContainer.innerHTML = ''; // Clear previous content
 
-    if (result === 'offer') {
-        subTierContainer.classList.remove('hidden'); // Show sub-tier
+    const lenderGroups = tierContent.querySelectorAll('.lender-group');
+    let hasOffer = false;
 
-        // Add sub-tier information
-        const subTierTitle = document.createElement('h3');
-        subTierTitle.innerText = `Tier ${tierNumber} Full Apply Configuration for ${lenderName}`;
-        subTierContainer.appendChild(subTierTitle);
+    // Loop through each lender group in the tier
+    lenderGroups.forEach((group, index) => {
+        const lenderSelect = group.querySelector('.lender-select');
+        const resultSelect = group.querySelector('.result-select');
 
-        // Add result dropdown
-        const fullApplyResultSelect = document.createElement('select');
-        fullApplyResultSelect.classList.add('result-select');
-        fullApplyResultSelect.innerHTML = `
-            <option value="" disabled selected>Select Full Apply Result</option>
-            <option value="full-apply-offer">Full Apply Offer</option>
-            <option value="full-apply-decline">Full Apply Decline</option>
-            <option value="full-apply-pending">Full Apply Decision Pending</option>
-        `;
-        subTierContainer.appendChild(fullApplyResultSelect);
+        if (resultSelect.value === 'offer') {
+            hasOffer = true;
+            const lenderName = lenderSelect.value;
 
-        // Add approved amount input for Full Apply Offer
-        const approvedAmountInput = document.createElement('input');
-        approvedAmountInput.type = 'number';
-        approvedAmountInput.placeholder = 'Enter Approved Amount';
-        approvedAmountInput.classList.add('approved-amount-input');
-        approvedAmountInput.style.display = 'none'; // Hide by default
+            // Create sub-tier section for this lender
+            const subTierLenderGroup = document.createElement('div');
+            subTierLenderGroup.classList.add('sub-tier-lender');
+            
+            // Sub-tier title
+            const subTierTitle = document.createElement('h3');
+            subTierTitle.innerText = `Full Apply Configuration for ${lenderName}`;
+            subTierLenderGroup.appendChild(subTierTitle);
 
-        fullApplyResultSelect.onchange = function () {
-            if (fullApplyResultSelect.value === 'full-apply-offer') {
-                approvedAmountInput.style.display = 'block'; // Show amount input when offer
-            } else {
-                approvedAmountInput.style.display = 'none'; // Hide otherwise
-            }
-        };
-        subTierContainer.appendChild(approvedAmountInput);
+            // Full Apply result dropdown
+            const fullApplyResultSelect = document.createElement('select');
+            fullApplyResultSelect.classList.add('result-select');
+            fullApplyResultSelect.innerHTML = `
+                <option value="" disabled selected>Select Full Apply Result</option>
+                <option value="full-apply-offer">Full Apply Offer</option>
+                <option value="full-apply-decline">Full Apply Decline</option>
+                <option value="full-apply-pending">Full Apply Decision Pending</option>
+            `;
+            subTierLenderGroup.appendChild(fullApplyResultSelect);
+
+            // Approved Amount input (only shown if Full Apply Offer is selected)
+            const approvedAmountInput = document.createElement('input');
+            approvedAmountInput.type = 'number';
+            approvedAmountInput.placeholder = 'Enter Approved Amount';
+            approvedAmountInput.classList.add('approved-amount-input');
+            approvedAmountInput.style.display = 'none'; // Hide by default
+
+            fullApplyResultSelect.onchange = function () {
+                if (fullApplyResultSelect.value === 'full-apply-offer') {
+                    approvedAmountInput.style.display = 'block'; // Show amount input when offer
+                } else {
+                    approvedAmountInput.style.display = 'none'; // Hide otherwise
+                }
+            };
+            subTierLenderGroup.appendChild(approvedAmountInput);
+
+            subTierContainer.appendChild(subTierLenderGroup);
+        }
+    });
+
+    if (hasOffer) {
+        subTierContainer.classList.remove('hidden'); // Show sub-tier if there are offers
     } else {
-        subTierContainer.classList.add('hidden'); // Hide sub-tier
+        subTierContainer.classList.add('hidden'); // Hide sub-tier if no offers
     }
+}
+
+// Handle the addition of a lender based on marketplace or split settings
+function handleLenderSelectionChange(tierNumber) {
+    const subTierContainer = document.getElementById(`subTier${tierNumber}Content`);
+    subTierContainer.classList.add('hidden'); // Hide sub-tier initially
 }
