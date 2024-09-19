@@ -44,7 +44,7 @@ function handleResultChange(tierNumber) {
 
         lendersInTier.forEach((lenderSelect, index) => {
             const lenderName = lenderSelect.value;
-            const lenderResult = resultsInTier[index].value;
+            const lenderResult = resultsInTier[index].value;  // Ensure this is tied to the actual lender result dropdown
 
             if (lenderResult === 'offer') {
                 // Display lender name, full apply result dropdown, and approved amount field
