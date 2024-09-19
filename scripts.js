@@ -36,7 +36,7 @@ function handleTierChange(tierNumber) {
     }
 }
 
-// Marketplace configuration with ability to add more lenders, ensuring new lenders appear above the button
+// Marketplace configuration with ability to add more lenders
 function addMarketplaceTier(container, verticalMarket, tierNumber) {
     let lenderCount = 1;
 
@@ -152,7 +152,7 @@ function updateSelectedLenders() {
     });
 }
 
-// Check if sub-tier should appear for full apply decisioning, based on lenders set to "offer"
+// Sub-tier logic: show sub-tier for lenders with offer result
 function checkSubTier(tierNumber) {
     const tierContent = document.getElementById(`tier${tierNumber}Content`);
     const subTierContainer = document.getElementById(`subTier${tierNumber}Content`);
@@ -160,20 +160,22 @@ function checkSubTier(tierNumber) {
 
     const lenderGroups = tierContent.querySelectorAll('.lender-group');
     let hasOffer = false;
+    const processedLenders = new Set(); // To track processed lenders for split tiers
 
-    // Loop through each lender group in the tier
     lenderGroups.forEach((group) => {
         const lenderSelect = group.querySelector('.lender-select');
         const resultSelect = group.querySelector('.result-select');
 
-        if (resultSelect.value === 'offer') {
+        if (resultSelect.value === 'offer' && !processedLenders.has(lenderSelect.value)) {
             hasOffer = true;
+            processedLenders.add(lenderSelect.value); // Mark lender as processed
+
             const lenderName = lenderSelect.value;
 
             // Create sub-tier section for this lender
             const subTierLenderGroup = document.createElement('div');
             subTierLenderGroup.classList.add('sub-tier-lender');
-            
+
             // Sub-tier title
             const subTierTitle = document.createElement('h3');
             subTierTitle.innerText = `Full Apply Configuration for ${lenderName}`;
@@ -190,18 +192,18 @@ function checkSubTier(tierNumber) {
             `;
             subTierLenderGroup.appendChild(fullApplyResultSelect);
 
-            // Approved Amount input (only shown if Full Apply Offer is selected)
+            // Approved Amount input (shown only for Full Apply Offer)
             const approvedAmountInput = document.createElement('input');
             approvedAmountInput.type = 'number';
             approvedAmountInput.placeholder = 'Enter Approved Amount';
             approvedAmountInput.classList.add('approved-amount-input');
-            approvedAmountInput.style.display = 'none'; // Hide by default
+            approvedAmountInput.style.display = 'none';
 
             fullApplyResultSelect.onchange = function () {
                 if (fullApplyResultSelect.value === 'full-apply-offer') {
-                    approvedAmountInput.style.display = 'block'; // Show amount input when offer
+                    approvedAmountInput.style.display = 'block'; // Show approved amount input
                 } else {
-                    approvedAmountInput.style.display = 'none'; // Hide otherwise
+                    approvedAmountInput.style.display = 'none'; // Hide if not "offer"
                 }
             };
             subTierLenderGroup.appendChild(approvedAmountInput);
@@ -211,14 +213,8 @@ function checkSubTier(tierNumber) {
     });
 
     if (hasOffer) {
-        subTierContainer.classList.remove('hidden'); // Show sub-tier if there are offers
+        subTierContainer.classList.remove('hidden');
     } else {
-        subTierContainer.classList.add('hidden'); // Hide sub-tier if no offers
+        subTierContainer.classList.add('hidden');
     }
-}
-
-// Handle the addition of a lender based on marketplace or split settings
-function handleLenderSelectionChange(tierNumber) {
-    const subTierContainer = document.getElementById(`subTier${tierNumber}Content`);
-    subTierContainer.classList.add('hidden'); // Hide sub-tier initially
 }
