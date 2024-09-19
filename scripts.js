@@ -13,7 +13,6 @@ function resetTiers() {
     for (let i = 1; i <= 3; i++) {
         document.getElementById(`tier${i}Config`).value = "";
         document.getElementById(`tier${i}Content`).innerHTML = "";
-        document.getElementById(`tier${i}Result`).value = "";
         document.getElementById(`tier${i}Designation`).value = "";
         document.getElementById(`subTier${i}Content`).innerHTML = "";
         document.getElementById(`subTier${i}Content`).classList.add('hidden');
@@ -23,34 +22,26 @@ function resetTiers() {
 // Handle changes in the tier designation (Pre-Qualification or Full Apply)
 function handleDesignationChange(tierNumber) {
     const designation = document.getElementById(`tier${tierNumber}Designation`).value;
-    const tierResult = document.getElementById(`tier${tierNumber}Result`);
-
-    // Clear previous result if designation changes
-    tierResult.value = "";
     document.getElementById(`subTier${tierNumber}Content`).classList.add('hidden');
 }
 
-// Handle changes in the tier result
+// Handle changes in the lender result
 function handleResultChange(tierNumber) {
     const designation = document.getElementById(`tier${tierNumber}Designation`).value;
-    const result = document.getElementById(`tier${tierNumber}Result`).value;
+    const lendersInTier = document.querySelectorAll(`#tier${tierNumber}Content .lender-select`);
+    const resultsInTier = document.querySelectorAll(`#tier${tierNumber}Content .result-select`);
     const subTierContent = document.getElementById(`subTier${tierNumber}Content`);
+    const subTierHtml = [];
 
-    // Only show sub-tier if designation is Pre-Qualification and result is Offer
-    if (designation === 'preQualification' && result === 'offer') {
-        const lendersInTier = document.querySelectorAll(`#tier${tierNumber}Content .lender-select`);
-        const resultsInTier = document.querySelectorAll(`#tier${tierNumber}Content .result-select`);
-        const subTierHtml = [];
-
-        // Add a title for the sub-tier
+    if (designation === 'preQualification') {
+        // Add title for sub-tier
         subTierHtml.push(`<hr><h3>Tier ${tierNumber} Full Apply Configuration</h3>`);
 
         lendersInTier.forEach((lenderSelect, index) => {
             const lenderName = lenderSelect.value;
-            const lenderResult = resultsInTier[index].value;  // Ensure this is tied to the actual lender result dropdown
+            const lenderResult = resultsInTier[index].value;
 
             if (lenderResult === 'offer') {
-                // Display lender name, full apply result dropdown, and approved amount field
                 subTierHtml.push(`
                     <div class="sub-tier-lender">
                         <label>${lenderName} (Full Apply Result)</label>
@@ -83,16 +74,16 @@ function handleTierChange(tierNumber) {
     const selectedConfig = document.getElementById(`tier${tierNumber}Config`).value;
 
     if (selectedConfig === 'standard') {
-        addLenderDropdown(tierContent, verticalMarket);
+        addLenderDropdown(tierContent, verticalMarket, tierNumber);
     } else if (selectedConfig === 'marketplace') {
-        addMarketplaceTier(tierContent, verticalMarket);
+        addMarketplaceTier(tierContent, verticalMarket, tierNumber);
     } else if (selectedConfig === 'split') {
-        addSplitDropdown(tierContent, 100, verticalMarket);
+        addSplitDropdown(tierContent, 100, verticalMarket, tierNumber);
     }
 }
 
-// Add lender dropdown to a tier
-function addLenderDropdown(container, verticalMarket) {
+// Add lender dropdown to a tier with a result dropdown next to it
+function addLenderDropdown(container, verticalMarket, tierNumber) {
     const lenderSelect = document.createElement('select');
     lenderSelect.classList.add('lender-select');
     lenderSelect.innerHTML = '<option value="" disabled selected>Select a lender</option>';
@@ -121,15 +112,19 @@ function addLenderDropdown(container, verticalMarket) {
         <option value="pending">Decision Pending</option>
     `;
 
+    resultSelect.onchange = function () {
+        handleResultChange(tierNumber);
+    };
+
     container.appendChild(resultSelect);
 }
 
 // Handle Marketplace configuration by adding multiple lenders
-function addMarketplaceTier(container, verticalMarket) {
+function addMarketplaceTier(container, verticalMarket, tierNumber) {
     let lenderCount = 1;
 
     // Add the initial lender dropdown with a result dropdown
-    addLenderDropdown(container, verticalMarket);
+    addLenderDropdown(container, verticalMarket, tierNumber);
 
     // Add the "Add Lender" button
     const addButton = document.createElement('button');
@@ -137,7 +132,7 @@ function addMarketplaceTier(container, verticalMarket) {
     addButton.innerText = '+ Add Lender';
     addButton.onclick = function () {
         if (lenderCount < 3) {  // Allows for 2 additional lenders (total of 3)
-            addLenderDropdown(container, verticalMarket);
+            addLenderDropdown(container, verticalMarket, tierNumber);
             lenderCount++;
         }
     };
@@ -146,12 +141,12 @@ function addMarketplaceTier(container, verticalMarket) {
 }
 
 // Add lender and percentage fields for Split configuration
-function addSplitDropdown(container, initialPercentage, verticalMarket) {
+function addSplitDropdown(container, initialPercentage, verticalMarket, tierNumber) {
     const lenderGroup = document.createElement('div');
     lenderGroup.classList.add('lender-group');
 
     // Add lender dropdown
-    addLenderDropdown(lenderGroup, verticalMarket);
+    addLenderDropdown(lenderGroup, verticalMarket, tierNumber);
 
     // Add percentage dropdown
     const percentageSelect = document.createElement('select');
@@ -163,6 +158,15 @@ function addSplitDropdown(container, initialPercentage, verticalMarket) {
         <option value="100">100%</option>
     `;
     percentageSelect.value = initialPercentage;
+
+    percentageSelect.onchange = function () {
+        const totalPercentage = Array.from(container.querySelectorAll('.percentage-select'))
+            .reduce((total, select) => total + parseInt(select.value), 0);
+
+        if (totalPercentage < 100 && container.children.length < 4) {
+            addSplitDropdown(container, 100 - totalPercentage, verticalMarket, tierNumber);
+        }
+    };
 
     lenderGroup.appendChild(percentageSelect);
     container.appendChild(lenderGroup);
