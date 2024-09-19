@@ -1,24 +1,3 @@
-const lendersByVertical = {
-    retail: ["Wells Fargo", "EasyPay", "Acima"],
-    electiveMedical: ["Care Credit", "Fortiva", "HFD"],
-    homeImprovement: ["Service", "Greensky", "BreadPay"]
-};
-
-const globalLenders = ["TD Bank", "Concora"];
-let selectedLenders = [];
-
-// Resets tiers when vertical market is changed
-function resetTiers() {
-    selectedLenders = [];
-    for (let i = 1; i <= 3; i++) {
-        document.getElementById(`tier${i}Config`).value = "";
-        document.getElementById(`tier${i}Content`).innerHTML = "";
-        document.getElementById(`tier${i}Designation`).value = "";
-        document.getElementById(`subTier${i}Content`).innerHTML = "";
-        document.getElementById(`subTier${i}Content`).classList.add('hidden');
-    }
-}
-
 // Handles changes to each tier based on the selected configuration
 function handleTierChange(tierNumber) {
     const verticalMarket = document.getElementById('verticalMarket').value;
@@ -36,8 +15,29 @@ function handleTierChange(tierNumber) {
     }
 }
 
+// Marketplace configuration with ability to add more lenders, ensuring new lenders appear above the button
+function addMarketplaceTier(container, verticalMarket, tierNumber) {
+    let lenderCount = 1;
+
+    // Add initial lender and result dropdown
+    addLenderDropdown(container, verticalMarket, tierNumber);
+
+    // Add "Add Lender" button
+    const addButton = document.createElement('button');
+    addButton.classList.add('btn-add-lender');
+    addButton.innerText = '+ Add Lender';
+    addButton.onclick = function () {
+        if (lenderCount < 3) {
+            addLenderDropdown(container, verticalMarket, tierNumber, addButton);
+            lenderCount++;
+        }
+    };
+
+    container.appendChild(addButton);
+}
+
 // Adds lender dropdown and corresponding result dropdown for Standard and Marketplace
-function addLenderDropdown(container, verticalMarket, tierNumber) {
+function addLenderDropdown(container, verticalMarket, tierNumber, beforeElement = null) {
     const lenderGroup = document.createElement('div');
     lenderGroup.classList.add('lender-group');
 
@@ -73,28 +73,11 @@ function addLenderDropdown(container, verticalMarket, tierNumber) {
     };
     lenderGroup.appendChild(resultSelect);
 
-    container.appendChild(lenderGroup);
-}
-
-// Marketplace configuration with ability to add more lenders
-function addMarketplaceTier(container, verticalMarket, tierNumber) {
-    let lenderCount = 1;
-
-    // Add initial lender and result dropdown
-    addLenderDropdown(container, verticalMarket, tierNumber);
-
-    // Add "Add Lender" button
-    const addButton = document.createElement('button');
-    addButton.classList.add('btn-add-lender');
-    addButton.innerText = '+ Add Lender';
-    addButton.onclick = function () {
-        if (lenderCount < 3) {
-            addLenderDropdown(container, verticalMarket, tierNumber);
-            lenderCount++;
-        }
-    };
-
-    container.appendChild(addButton);
+    if (beforeElement) {
+        container.insertBefore(lenderGroup, beforeElement); // Insert above the button
+    } else {
+        container.appendChild(lenderGroup);
+    }
 }
 
 // Split configuration logic
@@ -158,7 +141,7 @@ function checkSubTier(tierNumber) {
     let hasOffer = false;
 
     // Loop through each lender group in the tier
-    lenderGroups.forEach((group, index) => {
+    lenderGroups.forEach((group) => {
         const lenderSelect = group.querySelector('.lender-select');
         const resultSelect = group.querySelector('.result-select');
 
@@ -211,10 +194,4 @@ function checkSubTier(tierNumber) {
     } else {
         subTierContainer.classList.add('hidden'); // Hide sub-tier if no offers
     }
-}
-
-// Handle the addition of a lender based on marketplace or split settings
-function handleLenderSelectionChange(tierNumber) {
-    const subTierContainer = document.getElementById(`subTier${tierNumber}Content`);
-    subTierContainer.classList.add('hidden'); // Hide sub-tier initially
 }
