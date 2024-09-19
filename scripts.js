@@ -42,6 +42,9 @@ function handleResultChange(tierNumber) {
         const resultsInTier = document.querySelectorAll(`#tier${tierNumber}Content .result-select`);
         const subTierHtml = [];
 
+        // Add a title for the sub-tier
+        subTierHtml.push(`<hr><h3>Tier ${tierNumber} Full Apply Configuration</h3>`);
+
         lendersInTier.forEach((lenderSelect, index) => {
             const lenderName = lenderSelect.value;
             const lenderResult = resultsInTier[index].value;  // Ensure this is tied to the actual lender result dropdown
