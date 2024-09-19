@@ -7,7 +7,6 @@ const lendersByVertical = {
 const globalLenders = ["TD Bank", "Concora"];
 let selectedLenders = [];
 
-// Reset all tiers when a vertical market changes
 function resetTiers() {
     selectedLenders = [];
     for (let i = 1; i <= 3; i++) {
@@ -19,53 +18,7 @@ function resetTiers() {
     }
 }
 
-// Handle changes in the tier designation (Pre-Qualification or Full Apply)
-function handleDesignationChange(tierNumber) {
-    const designation = document.getElementById(`tier${tierNumber}Designation`).value;
-    document.getElementById(`subTier${tierNumber}Content`).classList.add('hidden');
-}
-
-// Handle changes in the lender result
-function handleResultChange(tierNumber) {
-    const designation = document.getElementById(`tier${tierNumber}Designation`).value;
-    const lendersInTier = document.querySelectorAll(`#tier${tierNumber}Content .lender-select`);
-    const resultsInTier = document.querySelectorAll(`#tier${tierNumber}Content .result-select`);
-    const subTierContent = document.getElementById(`subTier${tierNumber}Content`);
-    const subTierHtml = [];
-
-    if (designation === 'preQualification') {
-        // Add title for sub-tier
-        subTierHtml.push(`<hr><h3>Tier ${tierNumber} Full Apply Configuration</h3>`);
-
-        lendersInTier.forEach((lenderSelect, index) => {
-            const lenderName = lenderSelect.value;
-            const lenderResult = resultsInTier[index].value;
-
-            if (lenderResult === 'offer') {
-                subTierHtml.push(`
-                    <div class="sub-tier-lender">
-                        <label>${lenderName} (Full Apply Result)</label>
-                        <select class="full-apply-result">
-                            <option value="" disabled selected>Select Full Apply Result</option>
-                            <option value="full-apply-offer">Full Apply Offer</option>
-                            <option value="full-apply-decline">Full Apply Decline</option>
-                            <option value="full-apply-pending">Full Apply Decision Pending</option>
-                        </select>
-                        <input type="number" class="approved-amount" placeholder="Approved Amount" min="0" />
-                    </div>
-                `);
-            }
-        });
-
-        subTierContent.innerHTML = subTierHtml.join('');
-        subTierContent.classList.remove('hidden');
-    } else {
-        subTierContent.classList.add('hidden');
-        subTierContent.innerHTML = '';
-    }
-}
-
-// Handle changes in the tier configuration
+// Handle tier configuration changes
 function handleTierChange(tierNumber) {
     const verticalMarket = document.getElementById('verticalMarket').value;
     const tierContent = document.getElementById(`tier${tierNumber}Content`);
@@ -82,8 +35,12 @@ function handleTierChange(tierNumber) {
     }
 }
 
-// Add lender dropdown to a tier with a result dropdown next to it
+// Add lender dropdown and corresponding result dropdown for Standard and Marketplace
 function addLenderDropdown(container, verticalMarket, tierNumber) {
+    const lenderGroup = document.createElement('div');
+    lenderGroup.classList.add('lender-group');
+
+    // Lender dropdown
     const lenderSelect = document.createElement('select');
     lenderSelect.classList.add('lender-select');
     lenderSelect.innerHTML = '<option value="" disabled selected>Select a lender</option>';
@@ -99,10 +56,9 @@ function addLenderDropdown(container, verticalMarket, tierNumber) {
     lenderSelect.onchange = function () {
         updateSelectedLenders();
     };
+    lenderGroup.appendChild(lenderSelect);
 
-    container.appendChild(lenderSelect);
-
-    // Add result dropdown to the right of the lender dropdown
+    // Result dropdown for each lender
     const resultSelect = document.createElement('select');
     resultSelect.classList.add('result-select');
     resultSelect.innerHTML = `
@@ -111,27 +67,24 @@ function addLenderDropdown(container, verticalMarket, tierNumber) {
         <option value="no-offer">No Offer</option>
         <option value="pending">Decision Pending</option>
     `;
+    lenderGroup.appendChild(resultSelect);
 
-    resultSelect.onchange = function () {
-        handleResultChange(tierNumber);
-    };
-
-    container.appendChild(resultSelect);
+    container.appendChild(lenderGroup);
 }
 
-// Handle Marketplace configuration by adding multiple lenders
+// Marketplace configuration with ability to add more lenders
 function addMarketplaceTier(container, verticalMarket, tierNumber) {
     let lenderCount = 1;
 
-    // Add the initial lender dropdown with a result dropdown
+    // Add initial lender and result dropdown
     addLenderDropdown(container, verticalMarket, tierNumber);
 
-    // Add the "Add Lender" button
+    // Add "Add Lender" button
     const addButton = document.createElement('button');
     addButton.classList.add('btn-add-lender');
     addButton.innerText = '+ Add Lender';
     addButton.onclick = function () {
-        if (lenderCount < 3) {  // Allows for 2 additional lenders (total of 3)
+        if (lenderCount < 3) {
             addLenderDropdown(container, verticalMarket, tierNumber);
             lenderCount++;
         }
@@ -140,7 +93,7 @@ function addMarketplaceTier(container, verticalMarket, tierNumber) {
     container.appendChild(addButton);
 }
 
-// Add lender and percentage fields for Split configuration
+// Split configuration logic
 function addSplitDropdown(container, initialPercentage, verticalMarket, tierNumber) {
     const lenderGroup = document.createElement('div');
     lenderGroup.classList.add('lender-group');
@@ -172,7 +125,7 @@ function addSplitDropdown(container, initialPercentage, verticalMarket, tierNumb
     container.appendChild(lenderGroup);
 }
 
-// Update selected lenders to avoid duplicates
+// Avoid duplicate lender selections across tiers
 function updateSelectedLenders() {
     selectedLenders = Array.from(document.querySelectorAll('.lender-select'))
         .map(select => select.value)
