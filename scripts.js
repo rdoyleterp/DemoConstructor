@@ -89,8 +89,9 @@ function addLenderDropdown(container, verticalMarket, tierNumber, beforeElement 
         <option value="no-offer">No Offer</option>
         <option value="pending">Decision Pending</option>
     `;
-    resultSelect.onchange = function() {
+    resultSelect.onchange = function () {
         checkSubTier(tierNumber); // Check the sub-tier logic when the result is selected
+        toggleAmountField(resultSelect, lenderGroup, 'Pre-qualified Amount');
     };
     lenderGroup.appendChild(resultSelect);
 
@@ -190,23 +191,17 @@ function checkSubTier(tierNumber) {
                 <option value="full-apply-decline">Full Apply Decline</option>
                 <option value="full-apply-pending">Full Apply Decision Pending</option>
             `;
+            fullApplyResultSelect.onchange = function () {
+                toggleAmountField(fullApplyResultSelect, subTierLenderGroup, 'Approved Amount');
+            };
             subTierLenderGroup.appendChild(fullApplyResultSelect);
 
-            // Approved Amount input (shown only for Full Apply Offer)
-            const approvedAmountInput = document.createElement('input');
-            approvedAmountInput.type = 'number';
-            approvedAmountInput.placeholder = 'Enter Approved Amount';
-            approvedAmountInput.classList.add('approved-amount-input');
-            approvedAmountInput.style.display = 'none';
-
-            fullApplyResultSelect.onchange = function () {
-                if (fullApplyResultSelect.value === 'full-apply-offer') {
-                    approvedAmountInput.style.display = 'block'; // Show approved amount input
-                } else {
-                    approvedAmountInput.style.display = 'none'; // Hide if not "offer"
-                }
-            };
-            subTierLenderGroup.appendChild(approvedAmountInput);
+            // Pre-qualified amount input for the original offer
+            const preQualifiedAmountInput = document.createElement('input');
+            preQualifiedAmountInput.type = 'number';
+            preQualifiedAmountInput.placeholder = 'Pre-qualified Amount';
+            preQualifiedAmountInput.classList.add('approved-amount-input');
+            subTierLenderGroup.appendChild(preQualifiedAmountInput);
 
             subTierContainer.appendChild(subTierLenderGroup);
         }
@@ -216,5 +211,25 @@ function checkSubTier(tierNumber) {
         subTierContainer.classList.remove('hidden');
     } else {
         subTierContainer.classList.add('hidden');
+    }
+}
+
+// Shows or hides amount input field based on result selection
+function toggleAmountField(resultSelect, parentGroup, labelText) {
+    let amountInput = parentGroup.querySelector('.approved-amount-input');
+    
+    if (!amountInput) {
+        // If not already present, create a new input field
+        amountInput = document.createElement('input');
+        amountInput.type = 'number';
+        amountInput.placeholder = labelText;
+        amountInput.classList.add('approved-amount-input');
+        parentGroup.appendChild(amountInput);
+    }
+
+    if (resultSelect.value === 'offer' || resultSelect.value === 'full-apply-offer') {
+        amountInput.style.display = 'block'; // Show amount input
+    } else {
+        amountInput.style.display = 'none'; // Hide if not "offer"
     }
 }
