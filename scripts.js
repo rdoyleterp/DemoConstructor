@@ -7,7 +7,7 @@ const lendersByVertical = {
 const globalLenders = ["TD Bank", "Concora"];
 let selectedLenders = [];
 
-// Resets tiers when vertical market is changed
+// Function to reset the tiers when the vertical market changes
 function resetTiers() {
     selectedLenders = [];
     for (let i = 1; i <= 3; i++) {
@@ -19,7 +19,7 @@ function resetTiers() {
     }
 }
 
-// Handles changes to each tier based on the selected configuration
+// Handles the logic for tier change based on the selection
 function handleTierChange(tierNumber) {
     const verticalMarket = document.getElementById('verticalMarket').value;
     const tierContent = document.getElementById(`tier${tierNumber}Content`);
@@ -36,14 +36,11 @@ function handleTierChange(tierNumber) {
     }
 }
 
-// Marketplace configuration with ability to add more lenders
+// Marketplace configuration logic
 function addMarketplaceTier(container, verticalMarket, tierNumber) {
     let lenderCount = 1;
-
-    // Add initial lender and result dropdown
     addLenderDropdown(container, verticalMarket, tierNumber);
 
-    // Add "Add Lender" button
     const addButton = document.createElement('button');
     addButton.classList.add('btn-add-lender');
     addButton.innerText = '+ Add Lender';
@@ -57,12 +54,11 @@ function addMarketplaceTier(container, verticalMarket, tierNumber) {
     container.appendChild(addButton);
 }
 
-// Adds lender dropdown and corresponding result dropdown for Standard and Marketplace
+// Adds lender dropdown and result dropdown for tiers
 function addLenderDropdown(container, verticalMarket, tierNumber, beforeElement = null) {
     const lenderGroup = document.createElement('div');
     lenderGroup.classList.add('lender-group');
 
-    // Lender dropdown
     const lenderSelect = document.createElement('select');
     lenderSelect.classList.add('lender-select');
     lenderSelect.innerHTML = '<option value="" disabled selected>Select a lender</option>';
@@ -80,7 +76,6 @@ function addLenderDropdown(container, verticalMarket, tierNumber, beforeElement 
     };
     lenderGroup.appendChild(lenderSelect);
 
-    // Result dropdown for each lender
     const resultSelect = document.createElement('select');
     resultSelect.classList.add('result-select');
     resultSelect.innerHTML = `
@@ -90,27 +85,25 @@ function addLenderDropdown(container, verticalMarket, tierNumber, beforeElement 
         <option value="pending">Decision Pending</option>
     `;
     resultSelect.onchange = function () {
-        checkSubTier(tierNumber); // Check the sub-tier logic when the result is selected
+        checkSubTier(tierNumber);
         toggleAmountField(resultSelect, lenderGroup, 'Pre-qualified Amount');
     };
     lenderGroup.appendChild(resultSelect);
 
     if (beforeElement) {
-        container.insertBefore(lenderGroup, beforeElement); // Insert above the button
+        container.insertBefore(lenderGroup, beforeElement);
     } else {
         container.appendChild(lenderGroup);
     }
 }
 
-// Split configuration logic
+// Functionality for the Split configuration
 function addSplitDropdown(container, initialPercentage, verticalMarket, tierNumber) {
     const lenderGroup = document.createElement('div');
     lenderGroup.classList.add('lender-group');
 
-    // Add lender dropdown
     addLenderDropdown(lenderGroup, verticalMarket, tierNumber);
 
-    // Add percentage dropdown
     const percentageSelect = document.createElement('select');
     percentageSelect.classList.add('percentage-select');
     percentageSelect.innerHTML = `
@@ -134,7 +127,7 @@ function addSplitDropdown(container, initialPercentage, verticalMarket, tierNumb
     container.appendChild(lenderGroup);
 }
 
-// Avoid duplicate lender selections across tiers
+// Prevents duplicate lenders across the tiers
 function updateSelectedLenders() {
     selectedLenders = Array.from(document.querySelectorAll('.lender-select'))
         .map(select => select.value)
@@ -153,83 +146,109 @@ function updateSelectedLenders() {
     });
 }
 
-// Sub-tier logic: show sub-tier for lenders with offer result
-function checkSubTier(tierNumber) {
-    const tierContent = document.getElementById(`tier${tierNumber}Content`);
-    const subTierContainer = document.getElementById(`subTier${tierNumber}Content`);
-    subTierContainer.innerHTML = ''; // Clear previous content
+// Save, Load, and Delete Configuration Functions
 
-    const lenderGroups = tierContent.querySelectorAll('.lender-group');
-    let hasOffer = false;
-    const processedLenders = new Set(); // To track processed lenders for split tiers
+function saveConfiguration(name) {
+    const configuration = {
+        verticalMarket: document.getElementById('verticalMarket').value,
+        financingAmount: document.getElementById('financingAmount').value,
+        tiers: []
+    };
 
-    lenderGroups.forEach((group) => {
-        const lenderSelect = group.querySelector('.lender-select');
-        const resultSelect = group.querySelector('.result-select');
+    for (let i = 1; i <= 3; i++) {
+        const tierConfig = document.getElementById(`tier${i}Config`).value;
+        const tierDesignation = document.getElementById(`tier${i}Designation`).value;
+        const tierLenders = Array.from(document.querySelectorAll(`#tier${i}Content .lender-group .lender-select`))
+            .map(select => select.value);
+        const tierResults = Array.from(document.querySelectorAll(`#tier${i}Content .lender-group .result-select`))
+            .map(select => select.value);
 
-        if (resultSelect.value === 'offer' && !processedLenders.has(lenderSelect.value)) {
-            hasOffer = true;
-            processedLenders.add(lenderSelect.value); // Mark lender as processed
+        configuration.tiers.push({
+            config: tierConfig,
+            designation: tierDesignation,
+            lenders: tierLenders,
+            results: tierResults
+        });
+    }
 
-            const lenderName = lenderSelect.value;
+    localStorage.setItem(name, JSON.stringify(configuration));
+    alert(`Configuration "${name}" saved successfully!`);
+    updateConfigDropdown(); // Update the configuration dropdown after saving
+}
 
-            // Create sub-tier section for this lender
-            const subTierLenderGroup = document.createElement('div');
-            subTierLenderGroup.classList.add('sub-tier-lender');
+function loadConfiguration(name) {
+    const configuration = JSON.parse(localStorage.getItem(name));
 
-            // Sub-tier title
-            const subTierTitle = document.createElement('h3');
-            subTierTitle.innerText = `Full Apply Configuration for ${lenderName}`;
-            subTierLenderGroup.appendChild(subTierTitle);
+    if (configuration) {
+        document.getElementById('verticalMarket').value = configuration.verticalMarket;
+        document.getElementById('financingAmount').value = configuration.financingAmount;
+        resetTiers(); // Reset the tiers before loading the configuration
 
-            // Full Apply result dropdown
-            const fullApplyResultSelect = document.createElement('select');
-            fullApplyResultSelect.classList.add('result-select');
-            fullApplyResultSelect.innerHTML = `
-                <option value="" disabled selected>Select Full Apply Result</option>
-                <option value="full-apply-offer">Full Apply Offer</option>
-                <option value="full-apply-decline">Full Apply Decline</option>
-                <option value="full-apply-pending">Full Apply Decision Pending</option>
-            `;
-            fullApplyResultSelect.onchange = function () {
-                toggleAmountField(fullApplyResultSelect, subTierLenderGroup, 'Approved Amount');
-            };
-            subTierLenderGroup.appendChild(fullApplyResultSelect);
+        configuration.tiers.forEach((tier, index) => {
+            const tierNumber = index + 1;
+            document.getElementById(`tier${tierNumber}Config`).value = tier.config;
+            document.getElementById(`tier${tierNumber}Designation`).value = tier.designation;
+            handleTierChange(tierNumber); // Update tier content
 
-            // Pre-qualified amount input for the original offer
-            const preQualifiedAmountInput = document.createElement('input');
-            preQualifiedAmountInput.type = 'number';
-            preQualifiedAmountInput.placeholder = 'Pre-qualified Amount';
-            preQualifiedAmountInput.classList.add('approved-amount-input');
-            subTierLenderGroup.appendChild(preQualifiedAmountInput);
+            tier.lenders.forEach((lender, lenderIndex) => {
+                const lenderSelects = document.querySelectorAll(`#tier${tierNumber}Content .lender-select`);
+                lenderSelects[lenderIndex].value = lender;
+            });
 
-            subTierContainer.appendChild(subTierLenderGroup);
+            tier.results.forEach((result, resultIndex) => {
+                const resultSelects = document.querySelectorAll(`#tier${tierNumber}Content .result-select`);
+                resultSelects[resultIndex].value = result;
+            });
+        });
+
+        alert(`Configuration "${name}" loaded successfully!`);
+    } else {
+        alert(`Configuration "${name}" not found.`);
+    }
+}
+
+function deleteConfiguration(name) {
+    localStorage.removeItem(name);
+    alert(`Configuration "${name}" deleted successfully!`);
+    updateConfigDropdown(); // Update the configuration dropdown after deletion
+}
+
+// Updates the dropdown with saved configurations
+function updateConfigDropdown() {
+    const configSelect = document.getElementById('configSelect');
+    configSelect.innerHTML = '<option value="" disabled selected>Select Configuration</option>';
+
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key !== 'demoConfiguration') {
+            configSelect.innerHTML += `<option value="${key}">${key}</option>`;
         }
-    });
-
-    if (hasOffer) {
-        subTierContainer.classList.remove('hidden');
-    } else {
-        subTierContainer.classList.add('hidden');
     }
 }
 
-// Shows or hides amount input field based on result selection
-function toggleAmountField(resultSelect, parentGroup, labelText) {
-    let amountInput = parentGroup.querySelector('.approved-amount-input');
-    
-    if (!amountInput) {
-        // If not already present, create a new input field
-        amountInput = document.createElement('input');
-        amountInput.type = 'number';
-        amountInput.placeholder = labelText;
-        amountInput.classList.add('approved-amount-input');
-        parentGroup.appendChild(amountInput);
-    }
+// Preload configurations when page loads
+window.onload = function () {
+    updateConfigDropdown();
+};
 
-    if (resultSelect.value === 'offer' || resultSelect.value === 'full-apply-offer') {
-        amountInput.style.display = 'block'; // Show amount input
-    } else {
-        amountInput.style.display = 'none'; // Hide if not "offer"
+// Event Listeners for Save, Load, and Delete buttons
+document.getElementById('saveConfigBtn').addEventListener('click', () => {
+    const configName = prompt("Enter a name for this configuration:");
+    if (configName) {
+        saveConfiguration(configName);
     }
-}
+});
+
+document.getElementById('loadConfigBtn').addEventListener('click', () => {
+    const configName = document.getElementById('configSelect').value;
+    if (configName) {
+        loadConfiguration(configName);
+    }
+});
+
+document.getElementById('deleteConfigBtn').addEventListener('click', () => {
+    const configName = document.getElementById('configSelect').value;
+    if (configName) {
+        deleteConfiguration(configName);
+    }
+});
