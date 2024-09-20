@@ -1,55 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lender Cascade Demo Creation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <h1>Lender Cascade Demo Creation</h1>
+
+    <!-- Configuration Menu -->
+    <div class="config-menu" onclick="toggleConfigMenu()">Configurations &#9662;</div>
+    <div class="config-menu-content" id="configMenuContent">
+        <select id="configSelect">
+            <option value="" disabled selected>Select Configuration</option>
+        </select>
+        <a href="#" id="saveConfigBtn">Save Configuration</a>
+        <a href="#" id="loadConfigBtn">Load Configuration</a>
+        <a href="#" id="deleteConfigBtn">Delete Configuration</a>
+    </div>
+
+    <div class="container">
+        <!-- General Configuration Section -->
+        <div class="section" id="generalConfig">
+            <h2>General Configuration</h2>
+            <div class="form-group">
+                <label for="verticalMarket">Vertical Market:</label>
+                <select id="verticalMarket" onchange="resetTiers()">
+                    <option value="" disabled selected>Select Vertical Market</option>
+                    <option value="retail">Retail</option>
+                    <option value="electiveMedical">Elective Medical</option>
+                    <option value="homeImprovement">Home Improvement</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="financingAmount">Financing Amount:</label>
+                <span class="dollar-sign">$</span>
+                <input type="number" id="financingAmount" name="financingAmount" min="0" placeholder="Enter amount" />
+            </div>
+        </div>
+
+        <!-- Tier 1 Section -->
+        <div class="section" id="tier1">
+            <h2>Tier 1</h2>
             <div class="form-group">
                 <label for="tier1Designation">Tier Designation:</label>
-                <select id="tier1Designation" onchange="handleDesignationChange(1)">
+                <select id="tier1Designation">
                     <option value="" disabled selected>Select Tier Designation</option>
-                    <option value="" disabled selected>Select Designation</option>
-                    <option value="preQualification">Pre-Qualification</option>
-                    <option value="fullApply">Full Apply</option>
+                    <option value="pre-qual">Pre-qualification</option>
+                    <option value="full-apply">Full Apply</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="tier1Config">Tier Configuration:</label>
+                <select id="tier1Config" onchange="handleTierChange(1)">
+                    <option value="" disabled selected>Select Configuration</option>
+                    <option value="standard">Standard</option>
+                    <option value="marketplace">Marketplace</option>
+                    <option value="split">Split</option>
                 </select>
             </div>
             <div class="form-group" id="tier1Content"></div>
-            <div class="form-group">
-                <label for="tier1Result">Result:</label>
-                <select id="tier1Result" onchange="handleResultChange(1)">
-                    <option value="" disabled selected>Select Result</option>
-                    <option value="offer">Offer</option>
-                    <option value="no-offer">No Offer</option>
-                    <option value="pending">Decision Pending</option>
-                </select>
-            </div>
-            <!-- Sub-Tier Section -->
-            <div id="subTier1Content" class="hidden"></div>
-            <div class="form-group" id="subTier1Content" class="hidden"></div>
+            <div id="subTier1Content" class="sub-tier hidden"></div>
         </div>
 
-        <!-- Repeat for Tier 2 and Tier 3 -->
         <!-- Tier 2 Section -->
         <div class="section" id="tier2">
             <h2>Tier 2</h2>
             <div class="form-group">
                 <label for="tier2Designation">Tier Designation:</label>
-                <select id="tier2Designation" onchange="handleDesignationChange(2)">
+                <select id="tier2Designation">
                     <option value="" disabled selected>Select Tier Designation</option>
-                    <option value="" disabled selected>Select Designation</option>
-                    <option value="preQualification">Pre-Qualification</option>
-                    <option value="fullApply">Full Apply</option>
+                    <option value="pre-qual">Pre-qualification</option>
+                    <option value="full-apply">Full Apply</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="tier2Config">Tier Configuration:</label>
+                <select id="tier2Config" onchange="handleTierChange(2)">
+                    <option value="" disabled selected>Select Configuration</option>
+                    <option value="standard">Standard</option>
+                    <option value="marketplace">Marketplace</option>
+                    <option value="split">Split</option>
                 </select>
             </div>
             <div class="form-group" id="tier2Content"></div>
-            <div class="form-group">
-                <label for="tier2Result">Result:</label>
-                <select id="tier2Result" onchange="handleResultChange(2)">
-                    <option value="" disabled selected>Select Result</option>
-                    <option value="offer">Offer</option>
-                    <option value="no-offer">No Offer</option>
-                    <option value="pending">Decision Pending</option>
-                </select>
-            </div>
-            <!-- Sub-Tier Section -->
-            <div id="subTier2Content" class="hidden"></div>
-            <div class="form-group" id="subTier2Content" class="hidden"></div>
+            <div id="subTier2Content" class="sub-tier hidden"></div>
         </div>
 
         <!-- Tier 3 Section -->
@@ -57,30 +94,30 @@
             <h2>Tier 3</h2>
             <div class="form-group">
                 <label for="tier3Designation">Tier Designation:</label>
-                <select id="tier3Designation" onchange="handleDesignationChange(3)">
+                <select id="tier3Designation">
                     <option value="" disabled selected>Select Tier Designation</option>
-                    <option value="" disabled selected>Select Designation</option>
-                    <option value="preQualification">Pre-Qualification</option>
-                    <option value="fullApply">Full Apply</option>
+                    <option value="pre-qual">Pre-qualification</option>
+                    <option value="full-apply">Full Apply</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="tier3Config">Tier Configuration:</label>
+                <select id="tier3Config" onchange="handleTierChange(3)">
+                    <option value="" disabled selected>Select Configuration</option>
+                    <option value="standard">Standard</option>
+                    <option value="marketplace">Marketplace</option>
+                    <option value="split">Split</option>
                 </select>
             </div>
             <div class="form-group" id="tier3Content"></div>
-            <div class="form-group">
-                <label for="tier3Result">Result:</label>
-                <select id="tier3Result" onchange="handleResultChange(3)">
-                    <option value="" disabled selected>Select Result</option>
-                    <option value="offer">Offer</option>
-                    <option value="no-offer">No Offer</option>
-                    <option value="pending">Decision Pending</option>
-                </select>
-            </div>
-            <!-- Sub-Tier Section -->
-            <div id="subTier3Content" class="hidden"></div>
-            <div class="form-group" id="subTier3Content" class="hidden"></div>
+            <div id="subTier3Content" class="sub-tier hidden"></div>
         </div>
 
         <!-- Create JSON and Launch Demo Button -->
+        <button id="launchDemoBtn" class="btn-launch-demo">Create JSON and Launch Demo</button>
+
+        <!-- Download JSON Button -->
+        <button id="downloadJsonBtn" class="btn-download-json">Download JSON</button>
     </div>
 
     <script src="scripts.js"></script>
