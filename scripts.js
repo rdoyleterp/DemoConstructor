@@ -1,4 +1,3 @@
-// Sample data structure for lenders by vertical markets
 const lendersByVertical = {
     retail: ["Wells Fargo", "EasyPay", "Acima"],
     electiveMedical: ["Care Credit", "Fortiva", "HFD"],
@@ -37,7 +36,25 @@ function handleTierChange(tierNumber) {
     }
 }
 
-// Function to handle adding lender dropdowns and result dropdowns
+// Marketplace configuration logic
+function addMarketplaceTier(container, verticalMarket, tierNumber) {
+    let lenderCount = 1;
+    addLenderDropdown(container, verticalMarket, tierNumber);
+
+    const addButton = document.createElement('button');
+    addButton.classList.add('btn-add-lender');
+    addButton.innerText = '+ Add Lender';
+    addButton.onclick = function () {
+        if (lenderCount < 3) {
+            addLenderDropdown(container, verticalMarket, tierNumber, addButton);
+            lenderCount++;
+        }
+    };
+
+    container.appendChild(addButton);
+}
+
+// Adds lender dropdown and result dropdown for tiers
 function addLenderDropdown(container, verticalMarket, tierNumber, beforeElement = null) {
     const lenderGroup = document.createElement('div');
     lenderGroup.classList.add('lender-group');
@@ -69,6 +86,7 @@ function addLenderDropdown(container, verticalMarket, tierNumber, beforeElement 
     `;
     resultSelect.onchange = function () {
         checkSubTier(tierNumber);
+        toggleAmountField(resultSelect, lenderGroup, 'Pre-qualified Amount');
     };
     lenderGroup.appendChild(resultSelect);
 
@@ -79,7 +97,37 @@ function addLenderDropdown(container, verticalMarket, tierNumber, beforeElement 
     }
 }
 
-// Function to handle updating the selected lenders globally
+// Functionality for the Split configuration
+function addSplitDropdown(container, initialPercentage, verticalMarket, tierNumber) {
+    const lenderGroup = document.createElement('div');
+    lenderGroup.classList.add('lender-group');
+
+    addLenderDropdown(lenderGroup, verticalMarket, tierNumber);
+
+    const percentageSelect = document.createElement('select');
+    percentageSelect.classList.add('percentage-select');
+    percentageSelect.innerHTML = `
+        <option value="25">25%</option>
+        <option value="50">50%</option>
+        <option value="75">75%</option>
+        <option value="100">100%</option>
+    `;
+    percentageSelect.value = initialPercentage;
+
+    percentageSelect.onchange = function () {
+        const totalPercentage = Array.from(container.querySelectorAll('.percentage-select'))
+            .reduce((total, select) => total + parseInt(select.value), 0);
+
+        if (totalPercentage < 100 && container.children.length < 4) {
+            addSplitDropdown(container, 100 - totalPercentage, verticalMarket, tierNumber);
+        }
+    };
+
+    lenderGroup.appendChild(percentageSelect);
+    container.appendChild(lenderGroup);
+}
+
+// Prevents duplicate lenders across the tiers
 function updateSelectedLenders() {
     selectedLenders = Array.from(document.querySelectorAll('.lender-select'))
         .map(select => select.value)
@@ -109,6 +157,7 @@ function saveConfiguration(name) {
 
     for (let i = 1; i <= 3; i++) {
         const tierConfig = document.getElementById(`tier${i}Config`).value;
+        const tierDesignation = document.getElementById(`tier${i}Designation`).value;
         const tierLenders = Array.from(document.querySelectorAll(`#tier${i}Content .lender-group .lender-select`))
             .map(select => select.value);
         const tierResults = Array.from(document.querySelectorAll(`#tier${i}Content .lender-group .result-select`))
@@ -116,6 +165,7 @@ function saveConfiguration(name) {
 
         configuration.tiers.push({
             config: tierConfig,
+            designation: tierDesignation,
             lenders: tierLenders,
             results: tierResults
         });
@@ -137,6 +187,7 @@ function loadConfiguration(name) {
         configuration.tiers.forEach((tier, index) => {
             const tierNumber = index + 1;
             document.getElementById(`tier${tierNumber}Config`).value = tier.config;
+            document.getElementById(`tier${tierNumber}Designation`).value = tier.designation;
             handleTierChange(tierNumber); // Update tier content
 
             tier.lenders.forEach((lender, lenderIndex) => {
